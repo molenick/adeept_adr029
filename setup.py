@@ -85,8 +85,19 @@ except:
     pass
 
 os.system('sudo chmod 777 //home/pi/startup.sh')
-
-replace_num('/etc/rc.local','fi','fi\n//home/pi/startup.sh start')
+if os.path.exists('/etc/rc.local'):
+    replace_num('/etc/rc.local','fi','fi\n//home/pi/startup.sh start')
+else:
+    service_file = '/etc/systemd/system/adeept_startup.service'
+    service_content = '[Unit]\nDescription=Adeept ADR029 Startup Service\nAfter=network.target\n\n[Service]\nType=simple\nExecStart=/home/pi/startup.sh start\nUser=pi\nWorkingDirectory=/home/pi\nRestart=on-failure\n\n[Install]\nWantedBy=multi-user.target\n'
+    try:
+        with open(service_file, 'w') as f:
+            f.write(service_content)
+        os.system('sudo chmod 644 ' + service_file)
+        os.system('sudo systemctl daemon-reload')
+        os.system('sudo systemctl enable adeept_startup.service')
+    except Exception as e:
+        print('Error creating systemd service:', e)
 
 # try:
 #     os.system("sudo cp -f //home/pi/adeept_adr029/server/config.txt //etc/config.txt")
