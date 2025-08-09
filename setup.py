@@ -55,9 +55,8 @@ for x in range(3):
 commands_2 = [
     "sudo pip3 install RPi.GPIO",
     "sudo apt-get -y install libqtgui4 libhdf5-dev libhdf5-serial-dev libatlas-base-dev libjasper-dev libqt4-test",
-    "sudo git clone https://github.com/oblique/create_ap",
+    "sudo git clone https://github.com/oblique/create_ap " + thisPath + "/create_ap",
     "cd " + thisPath + "/create_ap && sudo make install",
-    "cd //home/pi/create_ap && sudo make install",
     "sudo apt-get install -y util-linux procps hostapd iproute2 iw haveged dnsmasq"
 ]
 
