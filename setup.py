@@ -36,7 +36,6 @@ commands_1 = [
     "sudo pip3 install flask",
     "sudo pip3 install flask_cors",
     "sudo pip3 install websockets",
-    "sudo apt-get install -y libjasper-dev",
     "sudo apt-get install -y libatlas-base-dev",
     "sudo apt-get install -y libgstreamer1.0-0",
     "sudo pip3 install adafruit-circuitpython-motor",
@@ -54,7 +53,7 @@ for x in range(3):
 
 commands_2 = [
     "sudo pip3 install RPi.GPIO",
-    "sudo apt-get -y install libqtgui4 libhdf5-dev libhdf5-serial-dev libatlas-base-dev libjasper-dev libqt4-test",
+    "sudo apt-get -y install libhdf5-dev libhdf5-serial-dev libatlas-base-dev git",
     "sudo git clone https://github.com/oblique/create_ap",
     "cd " + thisPath + "/create_ap && sudo make install",
     "cd //home/pi/create_ap && sudo make install",
