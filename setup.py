@@ -5,9 +5,12 @@
 
 import os
 import time
+import sys
 
 curpath = os.path.realpath(__file__)
 thisPath = "/" + os.path.dirname(curpath)
+username = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("SUDO_USER") or os.environ.get("USER")
+HOME_PATH = f"/home/{username}"
 
 def replace_num(file,initial,new_num):
     newline=""
@@ -36,7 +39,6 @@ commands_1 = [
     "sudo pip3 install flask",
     "sudo pip3 install flask_cors",
     "sudo pip3 install websockets",
-    "sudo apt-get install -y libjasper-dev",
     "sudo apt-get install -y libatlas-base-dev",
     "sudo apt-get install -y libgstreamer1.0-0",
     "sudo pip3 install adafruit-circuitpython-motor",
@@ -75,8 +77,8 @@ except:
     print('Error updating boot config to enable i2c. Please try again.')
 
 try:
-    os.system('sudo touch //home/pi/startup.sh')
-    with open("//home/pi/startup.sh",'w') as file_to_write:
+    os.system(f'sudo touch {HOME_PATH}/startup.sh')
+    with open(f"{HOME_PATH}/startup.sh",'w') as file_to_write:
         #you can choose how to control the robot
         file_to_write.write("#!/bin/sh\nsudo python3 " + thisPath + "/server/webServer.py")
 #       file_to_write.write("#!/bin/sh\nsudo python3 " + thisPath + "/server/server.py")
@@ -84,11 +86,22 @@ except:
     pass
 
 os.system('sudo chmod 777 //home/pi/startup.sh')
-
-replace_num('/etc/rc.local','fi','fi\n//home/pi/startup.sh start')
+if os.path.exists('/etc/rc.local'):
+    replace_num('/etc/rc.local','fi','fi\n//home/pi/startup.sh start')
+else:
+    service_file = '/etc/systemd/system/adeept_startup.service'
+    service_content = '[Unit]\nDescription=Adeept ADR029 Startup Service\nAfter=network.target\n\n[Service]\nType=simple\nExecStart=/home/pi/startup.sh start\nUser=pi\nWorkingDirectory=/home/pi\nRestart=on-failure\n\n[Install]\nWantedBy=multi-user.target\n'
+    try:
+        with open(service_file, 'w') as f:
+            f.write(service_content)
+        os.system('sudo chmod 644 ' + service_file)
+        os.system('sudo systemctl daemon-reload')
+        os.system('sudo systemctl enable adeept_startup.service')
+    except Exception as e:
+        print('Error creating systemd service:', e)
 
 # try:
-#     os.system("sudo cp -f //home/pi/adeept_adr029/server/config.txt //etc/config.txt")
+#     os.system(f"sudo cp -f {HOME_PATH}/adeept_adr029/server/config.txt //etc/config.txt")
 # except:
 #     os.system("sudo cp -f "+ thisPath  +"/adeept_rasptank/server/config.txt //etc/config.txt")
 print('The program in Raspberry Pi has been installed, disconnected and restarted. \nYou can now power off the Raspberry Pi to install the camera and driver board (Robot HAT). \nAfter turning on again, the Raspberry Pi will automatically run the program to set the servos port signal to turn the servos to the middle position, which is convenient for mechanical assembly.')
