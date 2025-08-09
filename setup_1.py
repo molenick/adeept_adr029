@@ -5,9 +5,12 @@
 
 import os
 import time
+import sys
 
 curpath = os.path.realpath(__file__)
 thisPath = "/" + os.path.dirname(curpath)
+username = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("SUDO_USER") or os.environ.get("USER")
+HOME_PATH = f"/home/{username}"
 
 def replace_num(file,initial,new_num):
     newline=""
@@ -138,7 +141,7 @@ commands_2 = [
     "sudo apt-get -y install libhdf5-dev libatlas-base-dev",
     "sudo git clone https://github.com/oblique/create_ap",
     "cd " + thisPath + "/create_ap && sudo make install",
-    "cd //home/pi/create_ap && sudo make install",
+    f"cd {HOME_PATH}/create_ap && sudo make install",
     "sudo apt-get install -y util-linux procps hostapd iproute2 iw haveged dnsmasq"
 ]
 
@@ -157,20 +160,20 @@ except:
     print('Error updating boot config to enable i2c. Please try again.')
 
 try:
-    os.system('sudo touch //home/pi/startup.sh')
-    with open("//home/pi/startup.sh",'w') as file_to_write:
+    os.system(f'sudo touch {HOME_PATH}/startup.sh')
+    with open(f"{HOME_PATH}/startup.sh",'w') as file_to_write:
         #you can choose how to control the robot
         file_to_write.write("#!/bin/sh\nsudo python3 " + thisPath + "/server/webServer.py")
 #       file_to_write.write("#!/bin/sh\nsudo python3 " + thisPath + "/server/server.py")
 except:
     pass
 
-os.system('sudo chmod 777 //home/pi/startup.sh')
+os.system(f'sudo chmod 777 {HOME_PATH}/startup.sh')
 
-replace_num('/etc/rc.local','fi','fi\n//home/pi/startup.sh start')
+replace_num('/etc/rc.local','fi',f'fi\n{HOME_PATH}/startup.sh start')
 
 # try:
-#     os.system("sudo cp -f //home/pi/adeept_adr029/server/config.txt //etc/config.txt")
+#     os.system(f"sudo cp -f {HOME_PATH}/adeept_adr029/server/config.txt //etc/config.txt")
 # except:
 #     os.system("sudo cp -f "+ thisPath  +"/adeept_rasptank/server/config.txt //etc/config.txt")
 print('The program in Raspberry Pi has been installed, disconnected and restarted. \nYou can now power off the Raspberry Pi to install the camera and driver board (Robot HAT). \nAfter turning on again, the Raspberry Pi will automatically run the program to set the servos port signal to turn the servos to the middle position, which is convenient for mechanical assembly.')
