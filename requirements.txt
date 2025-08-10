@@ -1,0 +1,9 @@
+flask
+flask-cors
+websockets
+RPi.GPIO
+smbus
+psutil
+adafruit-blinka
+adafruit-circuitpython-motor
+adafruit-circuitpython-pca9685
